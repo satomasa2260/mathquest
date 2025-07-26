@@ -32,25 +32,25 @@ class MathQuestGame {
         // レベル別設定
         this.levelSettings = {
             beginner: {
-                name: '初級',
+                name: 'しょきゅう',
                 operations: ['+', '-'],
                 maxNumber: 10,
                 timeLimit: 20,
-                description: '小学1-2年生向け'
+                description: 'しょうがく1-2ねんせいむけ'
             },
             intermediate: {
-                name: '中級',
+                name: 'ちゅうきゅう',
                 operations: ['+', '-', '×'],
                 maxNumber: 15,
                 timeLimit: 15,
-                description: '小学3-4年生向け'
+                description: 'しょうがく3-4ねんせいむけ'
             },
             advanced: {
-                name: '上級',
+                name: 'じょうきゅう',
                 operations: ['+', '-', '×', '÷'],
                 maxNumber: 20,
                 timeLimit: 12,
-                description: '小学5-6年生向け'
+                description: 'しょうがく5-6ねんせいむけ'
             }
         };
         
@@ -89,69 +89,21 @@ class MathQuestGame {
     spawnNewMonster() {
         // ボス出現判定
         if (this.stage === 5) {
-            this.currentMonster = this.midBoss;
-            this.monsterHp = this.midBoss.hp;
-            this.maxMonsterHp = this.midBoss.hp;
-            this.updateMessage(`中ボス ${this.currentMonster.name}が現れた！気をつけろ！`);
+            this.showBossWarning(5, '中ボス');
+            return; // 警告画面を表示するため、ここで処理を中断
         } else if (this.stage === 10) {
-            this.currentMonster = this.stageBoss;
-            this.monsterHp = this.stageBoss.hp;
-            this.maxMonsterHp = this.stageBoss.hp;
-            this.updateMessage(`ステージボス ${this.currentMonster.name}が現れた！決戦だ！`);
+            this.showBossWarning(10, 'ステージボス');
+            return; // 警告画面を表示するため、ここで処理を中断
         } else {
             const randomIndex = Math.floor(Math.random() * this.monsters.length);
             this.currentMonster = this.monsters[randomIndex];
             this.monsterHp = 100;
             this.maxMonsterHp = 100;
-            this.updateMessage(`${this.currentMonster.name}が現れた！算数で倒そう！`);
+            this.updateMessage(`${this.currentMonster.name}があらわれた！さんすうでたおそう！`);
         }
         
         // モンスターの見た目を更新
-        const monsterImage = document.getElementById('monsterImage');
-        const monsterPlaceholder = monsterImage.querySelector('.monster-placeholder');
-        
-        // 画像がある場合は画像を表示、ない場合は絵文字を表示
-        if (this.currentMonster.image) {
-            monsterPlaceholder.innerHTML = `<img src="images/${this.currentMonster.image}" alt="${this.currentMonster.name}" style="width: 100%; height: 100%; object-fit: contain;">`;
-        } else {
-            monsterPlaceholder.textContent = this.currentMonster.emoji;
-        }
-        
-        // 背景をステージとレベルに応じて設定
-        const gameContainer = document.getElementById('gameContainer');
-        let backgroundImage = 'back.png';
-        
-        // 初級のステージ6以降はback02.pngを使用
-        if (this.selectedLevel === 'beginner' && this.stage >= 6) {
-            backgroundImage = 'back02.png';
-        }
-        
-        // ボスの場合は特別なエフェクト
-        if (this.currentMonster.isBoss) {
-            // ボス戦の背景をランダムに選択
-            const bossBackgrounds = ['back_boss01.png', 'back_boss02.png'];
-            const randomBossBackground = bossBackgrounds[Math.floor(Math.random() * bossBackgrounds.length)];
-            
-            monsterImage.style.backgroundImage = `url('./images/${randomBossBackground}')`;
-            monsterImage.style.backgroundRepeat = 'no-repeat';
-            monsterImage.style.backgroundPosition = 'center center';
-            monsterImage.style.backgroundSize = 'cover';
-            monsterImage.style.border = '4px solid #ffd700';
-            monsterImage.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.8)';
-            monsterImage.classList.add('boss');
-            gameContainer.classList.add('boss-battle');
-            gameContainer.style.backgroundImage = `url('./images/${randomBossBackground}')`;
-        } else {
-            monsterImage.style.backgroundImage = `url('./images/${backgroundImage}')`;
-            monsterImage.style.backgroundRepeat = 'no-repeat';
-            monsterImage.style.backgroundPosition = 'center center';
-            monsterImage.style.backgroundSize = 'cover';
-            monsterImage.style.border = '4px solid #f7fafc';
-            monsterImage.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.3)';
-            monsterImage.classList.remove('boss');
-            gameContainer.classList.remove('boss-battle');
-            gameContainer.style.backgroundImage = `url('./images/${backgroundImage}')`;
-        }
+        this.updateMonsterAppearance();
     }
     
     lightenColor(color, percent) {
@@ -555,7 +507,7 @@ class MathQuestGame {
         } else {
             gameOverTitle.textContent = 'ゲームオーバー';
             gameOverTitle.style.color = '#dc3545';
-            gameOverMessage.textContent = `頑張ったね！スコア: ${this.score}`;
+            gameOverMessage.textContent = `がんばったね！スコア: ${this.score}`;
         }
         
         gameOverScreen.style.display = 'flex';
@@ -602,10 +554,119 @@ class MathQuestGame {
     
     quitGame() {
         // ゲーム終了メッセージを表示
-        alert(`ゲーム終了！\n最終スコア: ${this.score}\nステージ: ${this.stage}\nお疲れさまでした！`);
+        alert(`ゲームしゅうりょう！\nさいしゅうスコア: ${this.score}\nステージ: ${this.stage}\nおつかれさまでした！`);
         
         // レベル選択画面に戻る
         this.showLevelSelect();
+    }
+    
+    showBossWarning(stage, bossType) {
+        // 警告画面の要素を更新
+        document.getElementById('bossWarningStage').textContent = stage;
+        document.getElementById('bossWarningTitle').textContent = `${bossType}せんけいこく`;
+        
+        if (bossType === '中ボス') {
+            document.getElementById('bossWarningMessage').textContent = 'きょうりょくなちゅうボスがあらわれようとしています！';
+        } else {
+            document.getElementById('bossWarningMessage').textContent = 'さいきょうのステージボスがあらわれようとしています！';
+        }
+        
+        // 警告画面を表示
+        document.getElementById('bossWarningScreen').style.display = 'flex';
+    }
+    
+    hideBossWarning() {
+        document.getElementById('bossWarningScreen').style.display = 'none';
+    }
+    
+    startBossBattle(stage) {
+        this.hideBossWarning();
+        
+        // ボス戦を開始
+        if (stage === 5) {
+            this.currentMonster = this.midBoss;
+            this.monsterHp = this.midBoss.hp;
+            this.maxMonsterHp = this.midBoss.hp;
+            this.updateMessage(`ちゅうボス ${this.currentMonster.name}があらわれた！きをつけろ！`);
+        } else if (stage === 10) {
+            this.currentMonster = this.stageBoss;
+            this.monsterHp = this.stageBoss.hp;
+            this.maxMonsterHp = this.stageBoss.hp;
+            this.updateMessage(`ステージボス ${this.currentMonster.name}があらわれた！けっせんだ！`);
+        }
+        
+        // ボスフラグを確実に設定
+        this.currentMonster.isBoss = true;
+        
+        // モンスターの見た目を更新
+        this.updateMonsterAppearance();
+        
+        // 問題を生成
+        this.generateProblem();
+        
+        // UIを更新
+        this.updateUI();
+    }
+    
+    updateMonsterAppearance() {
+        const monsterImage = document.getElementById('monsterImage');
+        const monsterPlaceholder = monsterImage.querySelector('.monster-placeholder');
+        
+        // 画像がある場合は画像を表示、ない場合は絵文字を表示
+        if (this.currentMonster.image) {
+            monsterPlaceholder.innerHTML = `<img src="images/${this.currentMonster.image}" alt="${this.currentMonster.name}" style="width: 100%; height: 100%; object-fit: contain;">`;
+        } else {
+            monsterPlaceholder.textContent = this.currentMonster.emoji;
+        }
+        
+        // 背景をステージとレベルに応じて設定
+        const gameContainer = document.getElementById('gameContainer');
+        let backgroundImage = 'back.png';
+        
+        // ステージ5と10の場合はボス背景をランダムに選択
+        if (this.stage === 5 || this.stage === 10) {
+            const bossBackgrounds = ['back_boss01.png', 'back_boss02.png'];
+            backgroundImage = bossBackgrounds[Math.floor(Math.random() * bossBackgrounds.length)];
+        }
+        // 初級のステージ6以降はback02.pngを使用（ステージ5と10以外）
+        else if (this.selectedLevel === 'beginner' && this.stage >= 6) {
+            backgroundImage = 'back02.png';
+        }
+        
+        // スマホ画面の背景も更新（!importantで強制設定）
+        gameContainer.style.setProperty('background-image', `url('./images/${backgroundImage}')`, 'important');
+        gameContainer.style.setProperty('background-repeat', 'no-repeat', 'important');
+        gameContainer.style.setProperty('background-position', 'center center', 'important');
+        gameContainer.style.setProperty('background-size', 'cover', 'important');
+        
+        // デバッグ用ログ
+        console.log('背景画像設定:', {
+            stage: this.stage,
+            isBoss: this.currentMonster.isBoss,
+            backgroundImage: backgroundImage,
+            gameContainerBackground: gameContainer.style.backgroundImage
+        });
+        
+        // ボスの場合は特別なエフェクト
+        if (this.currentMonster.isBoss) {
+            monsterImage.style.backgroundImage = `url('./images/${backgroundImage}')`;
+            monsterImage.style.backgroundRepeat = 'no-repeat';
+            monsterImage.style.backgroundPosition = 'center center';
+            monsterImage.style.backgroundSize = 'cover';
+            monsterImage.style.border = '4px solid #ffd700';
+            monsterImage.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.8)';
+            monsterImage.classList.add('boss');
+            gameContainer.classList.add('boss-battle');
+        } else {
+            monsterImage.style.backgroundImage = `url('./images/${backgroundImage}')`;
+            monsterImage.style.backgroundRepeat = 'no-repeat';
+            monsterImage.style.backgroundPosition = 'center center';
+            monsterImage.style.backgroundSize = 'cover';
+            monsterImage.style.border = '4px solid #f7fafc';
+            monsterImage.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.3)';
+            monsterImage.classList.remove('boss');
+            gameContainer.classList.remove('boss-battle');
+        }
     }
     
     showLevelSelect() {
@@ -685,6 +746,12 @@ class MathQuestGame {
         
         document.getElementById('advancedBtn').addEventListener('click', () => {
             this.selectLevel('advanced');
+        });
+        
+        // ボス戦警告画面のボタン
+        document.getElementById('bossWarningBtn').addEventListener('click', () => {
+            const stage = parseInt(document.getElementById('bossWarningStage').textContent);
+            this.startBossBattle(stage);
         });
         
         // キーボード入力

@@ -3,41 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>算数クエスト - モンスターバトル</title>
+    <title>さんすうクエスト - モンスターバトル</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- レベル選択画面 -->
     <div class="level-select-screen" id="levelSelectScreen">
         <div class="level-select-content">
-            <h1 class="level-select-title">算数クエスト</h1>
-            <p class="level-select-subtitle">レベルを選択してください</p>
+                    <h1 class="level-select-title">さんすうクエスト</h1>
+        <p class="level-select-subtitle">レベルをえらんでください</p>
             
             <div class="level-buttons">
                 <button class="level-btn beginner" id="beginnerBtn">
                     <div class="level-icon">🌟</div>
                     <div class="level-info">
-                        <h3>初級</h3>
-                        <p>小学1-2年生向け</p>
-                        <p>足し算・引き算</p>
+                                            <h3>しょきゅう</h3>
+                    <p>しょうがく1-2ねんせいむけ</p>
+                    <p>たしざん・ひきざん</p>
                     </div>
                 </button>
                 
                 <button class="level-btn intermediate" id="intermediateBtn">
                     <div class="level-icon">⭐</div>
                     <div class="level-info">
-                        <h3>中級</h3>
-                        <p>小学3-4年生向け</p>
-                        <p>足し算・引き算・掛け算</p>
+                                            <h3>ちゅうきゅう</h3>
+                    <p>しょうがく3-4ねんせいむけ</p>
+                    <p>たしざん・ひきざん・かけざん</p>
                     </div>
                 </button>
                 
                 <button class="level-btn advanced" id="advancedBtn">
                     <div class="level-icon">💫</div>
                     <div class="level-info">
-                        <h3>上級</h3>
-                        <p>小学5-6年生向け</p>
-                        <p>足し算・引き算・掛け算・割り算</p>
+                                            <h3>じょうきゅう</h3>
+                    <p>しょうがく5-6ねんせいむけ</p>
+                    <p>たしざん・ひきざん・かけざん・わりざん</p>
                     </div>
                 </button>
             </div>
@@ -47,7 +47,7 @@
     <div class="game-container" id="gameContainer" style="display: none;">
         <!-- ゲームメニュー -->
         <div class="header-area">
-            <button class="quit-btn" id="quitBtn">ゲーム終了</button>
+            <button class="quit-btn" id="quitBtn">ゲームしゅうりょう</button>
         </div>
         
         <!-- モンスターエリア -->
@@ -65,14 +65,14 @@
 
         <!-- 問題表示エリア -->
         <div class="problem-area">
-            <div class="message-display" id="messageText">モンスターが現れた！算数で倒そう！</div>
+                            <div class="message-display" id="messageText">モンスターがあらわれた！さんすうでたおそう！</div>
             <div class="problem-display" id="problemDisplay">
                 8 × 7 = ?
             </div>
             <div class="timer-display">
-                <span>残り時間: </span>
-                <span id="timerDisplay">15</span>
-                <span>秒</span>
+                                    <span>のこりじかん: </span>
+                    <span id="timerDisplay">15</span>
+                    <span>びょう</span>
             </div>
         </div>
 
@@ -92,8 +92,8 @@
                 <button class="number-btn" data-number="9">9</button>
             </div>
             <div class="action-buttons">
-                <button class="clear-btn" id="clearBtn">クリア</button>
-                <button class="attack-btn" id="attackBtn">攻撃！</button>
+                <button class="clear-btn" id="clearBtn">けす</button>
+                <button class="attack-btn" id="attackBtn">こうげき！</button>
             </div>
         </div>
 
@@ -117,19 +117,33 @@
         <div class="game-over-screen" id="gameOverScreen">
             <div class="game-over-content">
                 <h2 id="gameOverTitle">ゲームオーバー</h2>
-                <p id="gameOverMessage">頑張ったね！</p>
-                <button class="restart-btn" id="restartBtn">もう一度挑戦</button>
+                <p id="gameOverMessage">がんばったね！</p>
+                <button class="restart-btn" id="restartBtn">もういちどちょうせん</button>
+            </div>
+        </div>
+
+        <!-- ボス戦警告画面 -->
+        <div class="boss-warning-screen" id="bossWarningScreen">
+            <div class="boss-warning-content">
+                <div class="boss-warning-icon">⚠️</div>
+                                    <h2 id="bossWarningTitle">ボスせんけいこく</h2>
+                    <p id="bossWarningMessage">きょうりょくなボスモンスターがあらわれようとしている！</p>
+                    <div class="boss-warning-info">
+                        <p>ステージ: <span id="bossWarningStage">5</span></p>
+                        <p>じゅんびはできていますか？</p>
+                    </div>
+                    <button class="boss-warning-btn" id="bossWarningBtn">せんとうかいし！</button>
             </div>
         </div>
 
         <!-- ゲーム終了確認画面 -->
         <div class="quit-confirm-screen" id="quitConfirmScreen">
             <div class="quit-confirm-content">
-                <h2>ゲームを終了しますか？</h2>
-                <p>現在のスコア: <span id="currentScore">0</span></p>
+                <h2>ゲームをしゅうりょうしますか？</h2>
+                <p>げんざいのスコア: <span id="currentScore">0</span></p>
                 <div class="quit-buttons">
                     <button class="cancel-btn" id="cancelQuitBtn">キャンセル</button>
-                    <button class="confirm-quit-btn" id="confirmQuitBtn">終了する</button>
+                    <button class="confirm-quit-btn" id="confirmQuitBtn">しゅうりょうする</button>
                 </div>
             </div>
         </div>
