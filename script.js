@@ -15,19 +15,20 @@ class MathQuestGame {
         
         // モンスターの種類と絵文字
         this.monsters = [
-            { name: 'ドラゴン', emoji: '🐉', color: '#ff6b6b', image: 'teki01.png' },
-            { name: 'ゴブリン', emoji: '👹', color: '#ff9a9e', image: 'teki02.png' },
-            { name: 'スライム', emoji: '👾', color: '#4ecdc4', image: 'teki01.png' },
-            { name: 'オーク', emoji: '👺', color: '#45b7d1', image: 'teki02.png' },
-            { name: 'ゴーレム', emoji: '🤖', color: '#96ceb4', image: 'teki01.png' },
-            { name: 'ウィッチ', emoji: '🧙‍♀️', color: '#feca57', image: 'teki02.png' },
-            { name: 'ミノタウロス', emoji: '🐮', color: '#ff9ff3', image: 'teki01.png' },
-            { name: 'フェニックス', emoji: '🦅', color: '#ff6b6b', image: 'teki02.png' }
+            { name: 'イチメドン', emoji: '🐉', color: '#ff6b6b', image: 'teki01.png' },
+            { name: 'ウルフ', emoji: '🐺', color: '#ff9a9e', image: 'teki02.png' },
+            { name: 'フェニックス', emoji: '🦅', color: '#4ecdc4', image: 'teki03.png' },
+            { name: 'グリズリー', emoji: '🐻', color: '#a0522d', image: 'teki04.png' },
+            { name: 'ゴルドナイト', emoji: '⚔️', color: '#ffd700', image: 'teki05.png' },
+            { name: 'ナイトウィザード', emoji: '🧙‍♂️', color: '#9b59b6', image: 'teki06.png' },
+            { name: 'ボーンウォーリア', emoji: '🦴', color: '#8b4513', image: 'teki07.png' },
+            { name: 'おばけキノコ', emoji: '🍄', color: '#e74c3c', image: 'teki08.png' },
+            { name: 'バルガード', emoji: '🛡️', color: '#2c3e50', image: 'teki09.png' }
         ];
         
         // ボスモンスター
-        this.midBoss = { name: 'デーモンロード', emoji: '👿', color: '#8b0000', hp: 150, isBoss: true, image: 'boss_dragon01.png' };
-        this.stageBoss = { name: 'ドラゴンキング', emoji: '🐲', color: '#ff4500', hp: 200, isBoss: true, image: 'boss_dragon01.png' };
+        this.midBoss = { name: 'ダークドラゴン', emoji: '👿', color: '#8b0000', hp: 150, isBoss: true, image: 'boss_dragon01.png' };
+        this.stageBoss = { name: 'まおう', emoji: '🐲', color: '#ff4500', hp: 200, isBoss: true, image: 'boss_maou.png' };
         
         // レベル別設定
         this.levelSettings = {
@@ -55,6 +56,7 @@ class MathQuestGame {
         };
         
         this.currentMonster = null;
+        this.usedMonsters = []; // 使用済みモンスターを管理する配列
         
         this.setupEventListeners();
     }
@@ -95,11 +97,27 @@ class MathQuestGame {
             this.showBossWarning(10, 'ステージボス');
             return; // 警告画面を表示するため、ここで処理を中断
         } else {
-            const randomIndex = Math.floor(Math.random() * this.monsters.length);
-            this.currentMonster = this.monsters[randomIndex];
+            // 使用済みでないモンスターを取得
+            const availableMonsters = this.monsters.filter(monster => 
+                !this.usedMonsters.includes(monster.name)
+            );
+            
+            // すべてのモンスターが使用済みの場合はリセット
+            if (availableMonsters.length === 0) {
+                this.usedMonsters = [];
+                availableMonsters.push(...this.monsters);
+            }
+            
+            // ランダムにモンスターを選択
+            const randomIndex = Math.floor(Math.random() * availableMonsters.length);
+            this.currentMonster = availableMonsters[randomIndex];
+            
+            // 使用済みリストに追加
+            this.usedMonsters.push(this.currentMonster.name);
+            
             this.monsterHp = 100;
             this.maxMonsterHp = 100;
-            this.updateMessage(`${this.currentMonster.name}があらわれた！さんすうでたおそう！`);
+            this.updateMessage(`${this.currentMonster.name}があらわれた！`);
         }
         
         // モンスターの見た目を更新
@@ -130,9 +148,9 @@ class MathQuestGame {
         // ボスの場合は特別な難易度
         let maxNumber;
         if (this.currentMonster.isBoss) {
-            if (this.currentMonster.name === 'デーモンロード') {
+            if (this.currentMonster.name === 'ダークドラゴン') {
                 maxNumber = Math.min(settings.maxNumber + this.stage * 3, settings.maxNumber + 10);
-            } else if (this.currentMonster.name === 'ドラゴンキング') {
+            } else if (this.currentMonster.name === 'まおう') {
                 maxNumber = Math.min(settings.maxNumber + this.stage * 4, settings.maxNumber + 15);
             }
         } else {
@@ -430,10 +448,10 @@ class MathQuestGame {
         // ボスの場合は特別な攻撃ダメージ
         let baseDamage, damage;
         if (this.currentMonster.isBoss) {
-            if (this.currentMonster.name === 'デーモンロード') {
+            if (this.currentMonster.name === 'ダークドラゴン') {
                 baseDamage = 20 + this.stage * 3;
                 damage = baseDamage + Math.floor(Math.random() * 15);
-            } else if (this.currentMonster.name === 'ドラゴンキング') {
+            } else if (this.currentMonster.name === 'まおう') {
                 baseDamage = 25 + this.stage * 4;
                 damage = baseDamage + Math.floor(Math.random() * 20);
             }
@@ -473,41 +491,76 @@ class MathQuestGame {
         
         // ボス撃破時の特別な処理
         if (this.currentMonster.isBoss) {
-            if (this.currentMonster.name === 'デーモンロード') {
+            if (this.currentMonster.name === 'ダークドラゴン') {
                 bonusScore = 200;
                 message = `中ボス ${this.currentMonster.name}を倒した！\n特別ボーナス獲得！ステージ${this.stage + 1}に進む！`;
-            } else if (this.currentMonster.name === 'ドラゴンキング') {
+            } else if (this.currentMonster.name === 'まおう') {
                 bonusScore = 500;
                 message = `ステージボス ${this.currentMonster.name}を倒した！\n大ボーナス獲得！おめでとう！`;
             }
         }
         
         this.score += bonusScore;
-        this.stage++;
         
-        this.updateMessage(message);
-        
-        // 少し待ってから新しいモンスターを出現
-        setTimeout(() => {
-            this.spawnNewMonster();
-            this.generateProblem();
-            this.updateUI();
-        }, 3000);
+        // ステージ10のボス（まおう）を倒した場合はゲームクリア
+        if (this.currentMonster.name === 'まおう') {
+            this.updateMessage(message);
+            setTimeout(() => {
+                this.showGameOver(true); // ゲームクリア
+            }, 2000);
+        } else {
+            this.stage++;
+            this.updateMessage(message);
+            
+            // 少し待ってから新しいモンスターを出現
+            setTimeout(() => {
+                this.spawnNewMonster();
+                this.generateProblem();
+                this.updateUI();
+            }, 3000);
+        }
     }
     
     showGameOver(won) {
         const gameOverScreen = document.getElementById('gameOverScreen');
         const gameOverTitle = document.getElementById('gameOverTitle');
         const gameOverMessage = document.getElementById('gameOverMessage');
+        const gameOverButtons = document.getElementById('gameOverButtons');
         
         if (won) {
             gameOverTitle.textContent = 'クリア！';
             gameOverTitle.style.color = '#28a745';
             gameOverMessage.textContent = `おめでとう！ステージ${this.stage}までクリアしたよ！スコア: ${this.score}`;
+            
+            // ステージ10クリア時は特別な選択肢を表示
+            if (this.stage === 10) {
+                gameOverButtons.innerHTML = `
+                    <button class="restart-btn" id="restartBtn">もういちどちょうせん</button>
+                    <button class="level-change-btn" id="levelChangeBtn">レベルをかえてちょうせん</button>
+                    <button class="quit-game-btn" id="quitGameBtn">ゲームしゅうりょう</button>
+                `;
+                
+                // ボタンのイベントリスナーを追加
+                setTimeout(() => {
+                    document.getElementById('levelChangeBtn').addEventListener('click', () => {
+                        this.showLevelSelect();
+                    });
+                    document.getElementById('quitGameBtn').addEventListener('click', () => {
+                        this.quitGame();
+                    });
+                }, 100);
+            } else {
+                gameOverButtons.innerHTML = `
+                    <button class="restart-btn" id="restartBtn">もういちどちょうせん</button>
+                `;
+            }
         } else {
             gameOverTitle.textContent = 'ゲームオーバー';
             gameOverTitle.style.color = '#dc3545';
             gameOverMessage.textContent = `がんばったね！スコア: ${this.score}`;
+            gameOverButtons.innerHTML = `
+                <button class="restart-btn" id="restartBtn">もういちどちょうせん</button>
+            `;
         }
         
         gameOverScreen.style.display = 'flex';
@@ -522,11 +575,18 @@ class MathQuestGame {
         this.currentAnswer = '';
         this.gameOver = false;
         this.currentTime = this.timeLimit;
+        this.usedMonsters = []; // 使用済みモンスターリストをリセット
         
         // タイマーを停止
         this.stopTimer();
         
+        // ゲームオーバー画面を非表示
         document.getElementById('gameOverScreen').style.display = 'none';
+        
+        // ボタンを元に戻す
+        document.getElementById('gameOverButtons').innerHTML = `
+            <button class="restart-btn" id="restartBtn">もういちどちょうせん</button>
+        `;
         
         this.initializeGame();
     }
