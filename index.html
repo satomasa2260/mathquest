@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>算数クエスト - モンスターバトル</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- レベル選択画面 -->
+    <div class="level-select-screen" id="levelSelectScreen">
+        <div class="level-select-content">
+            <h1 class="level-select-title">算数クエスト</h1>
+            <p class="level-select-subtitle">レベルを選択してください</p>
+            
+            <div class="level-buttons">
+                <button class="level-btn beginner" id="beginnerBtn">
+                    <div class="level-icon">🌟</div>
+                    <div class="level-info">
+                        <h3>初級</h3>
+                        <p>小学1-2年生向け</p>
+                        <p>足し算・引き算</p>
+                    </div>
+                </button>
+                
+                <button class="level-btn intermediate" id="intermediateBtn">
+                    <div class="level-icon">⭐</div>
+                    <div class="level-info">
+                        <h3>中級</h3>
+                        <p>小学3-4年生向け</p>
+                        <p>足し算・引き算・掛け算</p>
+                    </div>
+                </button>
+                
+                <button class="level-btn advanced" id="advancedBtn">
+                    <div class="level-icon">💫</div>
+                    <div class="level-info">
+                        <h3>上級</h3>
+                        <p>小学5-6年生向け</p>
+                        <p>足し算・引き算・掛け算・割り算</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-container" id="gameContainer" style="display: none;">
+        <!-- ゲームメニュー -->
+        <div class="header-area">
+            <button class="quit-btn" id="quitBtn">ゲーム終了</button>
+        </div>
+        
+        <!-- モンスターエリア -->
+        <div class="monster-area">
+            <div class="monster-container">
+                <div class="monster-image" id="monsterImage">
+                    <div class="monster-placeholder">🐉</div>
+                </div>
+                <div class="monster-hp-bar">
+                    <div class="hp-fill" id="monsterHpFill"></div>
+                    <span class="hp-text" id="monsterHpText">HP: 100/100</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 問題表示エリア -->
+        <div class="problem-area">
+            <div class="message-display" id="messageText">モンスターが現れた！算数で倒そう！</div>
+            <div class="problem-display" id="problemDisplay">
+                8 × 7 = ?
+            </div>
+            <div class="timer-display">
+                <span>残り時間: </span>
+                <span id="timerDisplay">15</span>
+                <span>秒</span>
+            </div>
+        </div>
+
+        <!-- 入力エリア -->
+        <div class="input-area">
+            <div class="answer-display" id="answerDisplay">?</div>
+            <div class="number-buttons">
+                <button class="number-btn" data-number="0">0</button>
+                <button class="number-btn" data-number="1">1</button>
+                <button class="number-btn" data-number="2">2</button>
+                <button class="number-btn" data-number="3">3</button>
+                <button class="number-btn" data-number="4">4</button>
+                <button class="number-btn" data-number="5">5</button>
+                <button class="number-btn" data-number="6">6</button>
+                <button class="number-btn" data-number="7">7</button>
+                <button class="number-btn" data-number="8">8</button>
+                <button class="number-btn" data-number="9">9</button>
+            </div>
+            <div class="action-buttons">
+                <button class="clear-btn" id="clearBtn">クリア</button>
+                <button class="attack-btn" id="attackBtn">攻撃！</button>
+            </div>
+        </div>
+
+        <!-- プレイヤー情報エリア -->
+        <div class="player-area">
+            <div class="score-display">
+                <span>スコア: </span>
+                <span id="scoreText">0</span>
+            </div>
+            <div class="stage-display">
+                <span>ステージ: </span>
+                <span id="stageText">1</span>
+            </div>
+            <div class="player-hp-bar">
+                <div class="hp-fill" id="playerHpFill"></div>
+                <span class="hp-text" id="playerHpText">HP: 100/100</span>
+            </div>
+        </div>
+
+        <!-- ゲームオーバー画面 -->
+        <div class="game-over-screen" id="gameOverScreen">
+            <div class="game-over-content">
+                <h2 id="gameOverTitle">ゲームオーバー</h2>
+                <p id="gameOverMessage">頑張ったね！</p>
+                <button class="restart-btn" id="restartBtn">もう一度挑戦</button>
+            </div>
+        </div>
+
+        <!-- ゲーム終了確認画面 -->
+        <div class="quit-confirm-screen" id="quitConfirmScreen">
+            <div class="quit-confirm-content">
+                <h2>ゲームを終了しますか？</h2>
+                <p>現在のスコア: <span id="currentScore">0</span></p>
+                <div class="quit-buttons">
+                    <button class="cancel-btn" id="cancelQuitBtn">キャンセル</button>
+                    <button class="confirm-quit-btn" id="confirmQuitBtn">終了する</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    
+    <!-- 背景画像読み込みテスト -->
+    <script>
+        // 背景画像の読み込みテスト
+        const testImage = new Image();
+        testImage.onload = function() {
+            console.log('背景画像が正常に読み込まれました:', this.src);
+        };
+        testImage.onerror = function() {
+            console.error('背景画像の読み込みに失敗しました:', this.src);
+        };
+        testImage.src = './images/back.png';
+        
+        // メディアクエリのテスト
+        const mediaQuery = window.matchMedia('(max-width: 767px)');
+        console.log('スマホ画面サイズかどうか:', mediaQuery.matches);
+        
+        function handleMediaQueryChange(e) {
+            console.log('画面サイズが変更されました:', e.matches ? 'スマホ' : 'PC');
+        }
+        mediaQuery.addListener(handleMediaQueryChange);
+    </script>
+</body>
+</html> 

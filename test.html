@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>背景画像テスト</title>
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+            margin: 0;
+        }
+
+        /* スマホ向け背景画像 */
+        @media (max-width: 767px) {
+            body {
+                background-image: url('./images/back.png') !important;
+                background-repeat: no-repeat !important;
+                background-position: center center !important;
+                background-size: cover !important;
+                background-attachment: scroll !important;
+            }
+        }
+
+        .test-container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .screen-size {
+            font-weight: bold;
+            color: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>背景画像テスト</h1>
+        <div class="info">
+            <p>現在の画面サイズ: <span class="screen-size" id="screenSize">読み込み中...</span></p>
+            <p>背景画像: <span id="bgStatus">チェック中...</span></p>
+        </div>
+        <div class="info">
+            <p>スマホサイズ（767px以下）で背景画像が表示されるはずです。</p>
+            <p>ブラウザの開発者ツールでデバイスモードに切り替えてテストしてください。</p>
+        </div>
+    </div>
+
+    <script>
+        // 画面サイズの表示
+        function updateScreenSize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const screenSizeElement = document.getElementById('screenSize');
+            const bgStatusElement = document.getElementById('bgStatus');
+            
+            screenSizeElement.textContent = `${width}px × ${height}px`;
+            
+            if (width <= 767) {
+                bgStatusElement.textContent = '背景画像が表示されるはず';
+                bgStatusElement.style.color = '#48bb78';
+            } else {
+                bgStatusElement.textContent = 'グラデーション背景';
+                bgStatusElement.style.color = '#e53e3e';
+            }
+        }
+
+        // 初期表示
+        updateScreenSize();
+        
+        // リサイズ時に更新
+        window.addEventListener('resize', updateScreenSize);
+
+        // 背景画像の読み込みテスト
+        const testImage = new Image();
+        testImage.onload = function() {
+            console.log('背景画像が正常に読み込まれました:', this.src);
+        };
+        testImage.onerror = function() {
+            console.error('背景画像の読み込みに失敗しました:', this.src);
+            document.getElementById('bgStatus').textContent = '画像読み込みエラー';
+            document.getElementById('bgStatus').style.color = '#e53e3e';
+        };
+        testImage.src = './images/back.png';
+    </script>
+</body>
+</html> 
