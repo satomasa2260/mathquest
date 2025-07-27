@@ -52,6 +52,22 @@ body {
         position: relative;
         backdrop-filter: blur(10px);
     }
+    
+    /* 上級ステージ用の背景画像 */
+    .game-container.advanced-stage {
+        background-image: url('./images/back_stage3_01.png') !important;
+        background-repeat: no-repeat !important;
+        background-position: center center !important;
+        background-size: cover !important;
+    }
+    
+    /* 上級ステージ6以降用の背景画像 */
+    .game-container.advanced-stage.stage-6-plus {
+        background-image: url('./images/back_stage3_02.png') !important;
+        background-repeat: no-repeat !important;
+        background-position: center center !important;
+        background-size: cover !important;
+    }
 }
 
 .header-area {
@@ -129,6 +145,16 @@ body {
 /* ボスモンスター用の特別なアニメーション */
 .monster-image.boss {
     animation: bossGlow 2s ease-in-out infinite alternate;
+}
+
+/* ボス画像を少し大きく表示 */
+.monster-image.boss .monster-placeholder img {
+    transform: scale(1.2);
+}
+
+/* 中級ボス画像をより大きく表示 */
+.monster-image.boss.intermediate-boss .monster-placeholder img {
+    transform: scale(2.0);
 }
 
 /* ボス戦用の背景 */
@@ -780,6 +806,90 @@ body {
     animation: shake 0.5s ease-in-out;
 }
 
+/* 進化エフェクト */
+@keyframes evolution {
+    0% {
+        transform: scale(1) rotate(0deg);
+        filter: brightness(1) hue-rotate(0deg);
+    }
+    25% {
+        transform: scale(1.2) rotate(5deg);
+        filter: brightness(1.5) hue-rotate(90deg);
+    }
+    50% {
+        transform: scale(1.5) rotate(-5deg);
+        filter: brightness(2) hue-rotate(180deg);
+    }
+    75% {
+        transform: scale(1.2) rotate(5deg);
+        filter: brightness(1.5) hue-rotate(270deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        filter: brightness(1) hue-rotate(360deg);
+    }
+}
+
+@keyframes evolutionGlow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 8px 20px rgba(128, 90, 213, 0.4);
+    }
+    25% {
+        box-shadow: 0 0 30px rgba(255, 0, 255, 0.9), 0 12px 30px rgba(255, 0, 255, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(0, 255, 255, 1), 0 16px 40px rgba(0, 255, 255, 0.8);
+    }
+    75% {
+        box-shadow: 0 0 30px rgba(255, 0, 255, 0.9), 0 12px 30px rgba(255, 0, 255, 0.6);
+    }
+}
+
+.evolution-effect {
+    animation: evolution 2s ease-in-out, evolutionGlow 2s ease-in-out;
+}
+
+/* 進化画面のオーバーレイ */
+.evolution-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 0, 255, 0.3) 0%, rgba(0, 255, 255, 0.3) 50%, rgba(255, 215, 0, 0.3) 100%);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    animation: evolutionPulse 1s ease-in-out infinite;
+}
+
+@keyframes evolutionPulse {
+    0%, 100% {
+        background: linear-gradient(135deg, rgba(255, 0, 255, 0.3) 0%, rgba(0, 255, 255, 0.3) 50%, rgba(255, 215, 0, 0.3) 100%);
+    }
+    50% {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.4) 0%, rgba(255, 215, 0, 0.4) 50%, rgba(255, 0, 255, 0.4) 100%);
+    }
+}
+
+.evolution-text {
+    color: #ffffff;
+    font-size: 3em;
+    font-weight: 900;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.5);
+    animation: evolutionTextGlow 1s ease-in-out infinite alternate;
+}
+
+@keyframes evolutionTextGlow {
+    0% {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.5);
+    }
+    100% {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 0, 255, 0.6);
+    }
+}
+
 @keyframes flash {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
@@ -1121,6 +1231,8 @@ body {
         background-size: cover;
     }
     
+
+    
     .monster-placeholder {
         font-size: 6em;
     }
@@ -1264,6 +1376,8 @@ body {
         background-position: center center;
         background-size: cover;
     }
+    
+
     
     .monster-placeholder {
         font-size: 4.5em;

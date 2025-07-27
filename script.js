@@ -13,8 +13,8 @@ class MathQuestGame {
         this.timerInterval = null;
         this.selectedLevel = null; // 選択されたレベル
         
-        // モンスターの種類と絵文字
-        this.monsters = [
+        // 初級レベルのモンスター
+        this.beginnerMonsters = [
             { name: 'イチメドン', emoji: '🐉', color: '#ff6b6b', image: 'teki01.png' },
             { name: 'ウルフ', emoji: '🐺', color: '#ff9a9e', image: 'teki02.png' },
             { name: 'フェニックス', emoji: '🦅', color: '#4ecdc4', image: 'teki03.png' },
@@ -26,8 +26,40 @@ class MathQuestGame {
             { name: 'バルガード', emoji: '🛡️', color: '#2c3e50', image: 'teki09.png' }
         ];
         
+        // 中級レベルのモンスター
+        this.intermediateMonsters = [
+            { name: 'ゲルイーカ', emoji: '🦑', color: '#8e44ad', image: 'teki_stage2_01.png' },
+            { name: 'クジランテ', emoji: '🐋', color: '#3498db', image: 'teki_stage2_02.png' },
+            { name: 'ゲコロス', emoji: '🦎', color: '#27ae60', image: 'teki_stage2_03.png' },
+            { name: 'ガメドラス', emoji: '🐢', color: '#16a085', image: 'teki_stage2_04.png' },
+            { name: 'シーヴァイパー', emoji: '🐍', color: '#e67e22', image: 'teki_stage2_05.png' },
+            { name: 'デスジョーズ', emoji: '🦈', color: '#2c3e50', image: 'teki_stage2_06.png' },
+            { name: 'スミバクダン', emoji: '💣', color: '#e74c3c', image: 'teki_stage2_07.png' },
+            { name: 'アビスロード', emoji: '👹', color: '#9b59b6', image: 'teki_stage2_08.png' }
+        ];
+        
+        // 上級レベルのモンスター
+        this.advancedMonsters = [
+            { name: 'イフリートン', emoji: '🔥', color: '#ff4500', image: 'teki_stage3_01.png' },
+            { name: 'バルグロス', emoji: '🦖', color: '#8b0000', image: 'teki_stage3_02.png' },
+            { name: 'ダグマール', emoji: '⚔️', color: '#4a4a4a', image: 'teki_stage3_03.png' },
+            { name: 'ゴルゴラン', emoji: '🦍', color: '#654321', image: 'teki_stage3_04.png' },
+            { name: 'メタルザイガス', emoji: '🤖', color: '#c0c0c0', image: 'teki_stage3_05.png' },
+            { name: 'メドゥローザ', emoji: '🌹', color: '#ff1493', image: 'teki_stage3_06.png' },
+            { name: 'シャドーホーン', emoji: '🦄', color: '#4b0082', image: 'teki_stage3_07.png' },
+            { name: 'じごくのまどうし', emoji: '👹', color: '#8b0000', image: 'teki_stage3_08.png' }
+        ];
+        
+        // 現在のレベルに応じたモンスター配列を設定
+        this.monsters = this.beginnerMonsters;
+        
         // ボスモンスター
-        this.midBoss = { name: 'ダークドラゴン', emoji: '👿', color: '#8b0000', hp: 150, isBoss: true, image: 'boss_dragon01.png' };
+        this.beginnerMidBoss = { name: 'ダークドラゴン', emoji: '🐲', color: '#8b0000', hp: 150, isBoss: true, image: 'boss_dragon01.png' };
+        this.intermediateMidBoss = { name: 'クラーゲン', emoji: '👿', color: '#8b0000', hp: 150, isBoss: true, image: 'boss_stage2_01.png' };
+        this.intermediateStageBoss = { name: 'ヴォルグレイド', emoji: '🐲', color: '#ff4500', hp: 200, isBoss: true, image: 'boss_stage2_02.png' };
+        this.advancedStageBoss = { name: 'フレイムデーモン', emoji: '🔥', color: '#ff4500', hp: 250, isBoss: true, image: 'boss_stage3_01.png' };
+        this.advancedFinalBoss = { name: 'グランギルドラ', emoji: '🐲', color: '#8b0000', hp: 300, isBoss: true, image: 'boss_stage3_02.png' };
+        this.advancedEvolvedBoss = { name: 'カオスギガドラ', emoji: '🐲', color: '#800080', hp: 400, isBoss: true, image: 'boss_stage3_03.png' };
         this.stageBoss = { name: 'まおう', emoji: '🐲', color: '#ff4500', hp: 200, isBoss: true, image: 'boss_maou.png' };
         
         // レベル別設定
@@ -57,6 +89,9 @@ class MathQuestGame {
         
         this.currentMonster = null;
         this.usedMonsters = []; // 使用済みモンスターを管理する配列
+        this.lastProblem = null; // 前回の問題を記録
+        this.advancedBossEvolved = false; // 上級ボスの進化フラグ
+
         
         this.setupEventListeners();
     }
@@ -65,6 +100,13 @@ class MathQuestGame {
         if (!this.selectedLevel) {
             return; // レベルが選択されていない場合は何もしない
         }
+        
+        // デバッグログ
+        console.log('ゲーム初期化:', {
+            selectedLevel: this.selectedLevel,
+            stage: this.stage
+        });
+        
         this.spawnNewMonster();
         this.generateProblem();
         this.updateUI();
@@ -73,6 +115,26 @@ class MathQuestGame {
     selectLevel(level) {
         this.selectedLevel = level;
         const settings = this.levelSettings[level];
+        
+        // レベルに応じてモンスター配列を設定
+        if (level === 'beginner') {
+            this.monsters = this.beginnerMonsters;
+        } else if (level === 'intermediate') {
+            this.monsters = this.intermediateMonsters;
+        } else if (level === 'advanced') {
+            this.monsters = this.advancedMonsters;
+        }
+        
+        // 使用済みモンスターリストをリセット
+        this.usedMonsters = [];
+        
+        // デバッグログ
+        console.log('レベル選択:', {
+            selectedLevel: this.selectedLevel,
+            level: level,
+            settings: settings,
+            monsters: this.monsters
+        });
         
         // レベルに応じて設定を調整
         this.timeLimit = settings.timeLimit;
@@ -141,48 +203,84 @@ class MathQuestGame {
         }
         const settings = this.levelSettings[this.selectedLevel];
         const operations = settings.operations;
-        const operation = operations[Math.floor(Math.random() * operations.length)];
         
-        let num1, num2, answer;
+        let num1, num2, answer, operation;
+        let attempts = 0;
+        const maxAttempts = 50; // 最大試行回数
         
-        // ボスの場合は特別な難易度
-        let maxNumber;
-        if (this.currentMonster.isBoss) {
-            if (this.currentMonster.name === 'ダークドラゴン') {
-                maxNumber = Math.min(settings.maxNumber + this.stage * 3, settings.maxNumber + 10);
-            } else if (this.currentMonster.name === 'まおう') {
-                maxNumber = Math.min(settings.maxNumber + this.stage * 4, settings.maxNumber + 15);
+        do {
+            operation = operations[Math.floor(Math.random() * operations.length)];
+            
+            // ボスの場合は特別な難易度
+            let maxNumber;
+            if (this.currentMonster.isBoss) {
+                if (this.currentMonster.name === 'ダークドラゴン') {
+                    maxNumber = Math.min(settings.maxNumber + this.stage * 3, settings.maxNumber + 10);
+                } else if (this.currentMonster.name === 'クラーゲン') {
+                    maxNumber = Math.min(settings.maxNumber + this.stage * 3, settings.maxNumber + 10);
+                            } else if (this.currentMonster.name === 'フレイムデーモン') {
+                maxNumber = Math.min(settings.maxNumber + this.stage * 3, settings.maxNumber + 12);
+                            } else if (this.currentMonster.name === 'グランギルドラ') {
+                maxNumber = Math.min(settings.maxNumber + this.stage * 5, settings.maxNumber + 20);
+            } else if (this.currentMonster.name === 'カオスギガドラ') {
+                maxNumber = Math.min(settings.maxNumber + this.stage * 6, settings.maxNumber + 25);
+                } else if (this.currentMonster.name === 'ヴォルグレイド') {
+                    maxNumber = Math.min(settings.maxNumber + this.stage * 4, settings.maxNumber + 15);
+                } else if (this.currentMonster.name === 'まおう') {
+                    maxNumber = Math.min(settings.maxNumber + this.stage * 4, settings.maxNumber + 15);
+                }
+            } else {
+                // ステージに応じて難易度を調整
+                maxNumber = Math.min(settings.maxNumber + this.stage * 2, settings.maxNumber + 5);
             }
-        } else {
-            // ステージに応じて難易度を調整
-            maxNumber = Math.min(settings.maxNumber + this.stage * 2, settings.maxNumber + 5);
-        }
-        
-        switch(operation) {
-            case '+':
-                num1 = Math.floor(Math.random() * maxNumber) + 1;
-                num2 = Math.floor(Math.random() * maxNumber) + 1;
-                answer = num1 + num2;
-                break;
-            case '-':
-                num1 = Math.floor(Math.random() * maxNumber) + 1;
-                num2 = Math.floor(Math.random() * num1) + 1;
-                answer = num1 - num2;
-                break;
-            case '×':
-                num1 = Math.floor(Math.random() * Math.min(12, maxNumber)) + 1;
-                num2 = Math.floor(Math.random() * Math.min(12, maxNumber)) + 1;
-                answer = num1 * num2;
-                break;
-            case '÷':
-                // 割り算は整数になるように調整
-                num2 = Math.floor(Math.random() * Math.min(10, maxNumber)) + 1;
-                answer = Math.floor(Math.random() * Math.min(10, maxNumber)) + 1;
-                num1 = num2 * answer;
-                break;
-        }
+            
+            switch(operation) {
+                case '+':
+                    num1 = Math.floor(Math.random() * maxNumber) + 1;
+                    num2 = Math.floor(Math.random() * maxNumber) + 1;
+                    answer = num1 + num2;
+                    break;
+                case '-':
+                    num1 = Math.floor(Math.random() * maxNumber) + 1;
+                    num2 = Math.floor(Math.random() * num1) + 1;
+                    answer = num1 - num2;
+                    break;
+                case '×':
+                    num1 = Math.floor(Math.random() * Math.min(12, maxNumber)) + 1;
+                    num2 = Math.floor(Math.random() * Math.min(12, maxNumber)) + 1;
+                    answer = num1 * num2;
+                    break;
+                case '÷':
+                    // 割り算は整数になるように調整
+                    num2 = Math.floor(Math.random() * Math.min(10, maxNumber)) + 1;
+                    answer = Math.floor(Math.random() * Math.min(10, maxNumber)) + 1;
+                    num1 = num2 * answer;
+                    break;
+            }
+            
+            attempts++;
+            
+            // 前回の問題と同じでないかチェック
+            if (this.lastProblem && 
+                this.lastProblem.num1 === num1 && 
+                this.lastProblem.num2 === num2 && 
+                this.lastProblem.operation === operation) {
+                continue; // 同じ問題の場合は再試行
+            }
+            
+            break; // 異なる問題が見つかったらループを抜ける
+            
+        } while (attempts < maxAttempts);
         
         this.currentProblem = {
+            num1: num1,
+            num2: num2,
+            operation: operation,
+            answer: answer
+        };
+        
+        // 前回の問題として記録
+        this.lastProblem = {
             num1: num1,
             num2: num2,
             operation: operation,
@@ -451,6 +549,21 @@ class MathQuestGame {
             if (this.currentMonster.name === 'ダークドラゴン') {
                 baseDamage = 20 + this.stage * 3;
                 damage = baseDamage + Math.floor(Math.random() * 15);
+            } else if (this.currentMonster.name === 'クラーゲン') {
+                baseDamage = 20 + this.stage * 3;
+                damage = baseDamage + Math.floor(Math.random() * 15);
+            } else if (this.currentMonster.name === 'フレイムデーモン') {
+                baseDamage = 20 + this.stage * 3;
+                damage = baseDamage + Math.floor(Math.random() * 15);
+            } else if (this.currentMonster.name === 'グランギルドラ') {
+                baseDamage = 30 + this.stage * 5;
+                damage = baseDamage + Math.floor(Math.random() * 25);
+            } else if (this.currentMonster.name === 'カオスギガドラ') {
+                baseDamage = 35 + this.stage * 6;
+                damage = baseDamage + Math.floor(Math.random() * 30);
+            } else if (this.currentMonster.name === 'ヴォルグレイド') {
+                baseDamage = 25 + this.stage * 4;
+                damage = baseDamage + Math.floor(Math.random() * 20);
             } else if (this.currentMonster.name === 'まおう') {
                 baseDamage = 25 + this.stage * 4;
                 damage = baseDamage + Math.floor(Math.random() * 20);
@@ -494,6 +607,28 @@ class MathQuestGame {
             if (this.currentMonster.name === 'ダークドラゴン') {
                 bonusScore = 200;
                 message = `中ボス ${this.currentMonster.name}を倒した！\n特別ボーナス獲得！ステージ${this.stage + 1}に進む！`;
+            } else if (this.currentMonster.name === 'クラーゲン') {
+                bonusScore = 200;
+                message = `中ボス ${this.currentMonster.name}を倒した！\n特別ボーナス獲得！ステージ${this.stage + 1}に進む！`;
+            } else if (this.currentMonster.name === 'ヴォルグレイド') {
+                bonusScore = 500;
+                message = `ステージボス ${this.currentMonster.name}を倒した！\n大ボーナス獲得！おめでとう！`;
+            } else if (this.currentMonster.name === 'フレイムデーモン') {
+                bonusScore = 300;
+                message = `中ボス ${this.currentMonster.name}を倒した！\n特別ボーナス獲得！ステージ${this.stage + 1}に進む！`;
+            } else if (this.currentMonster.name === 'グランギルドラ') {
+                if (this.selectedLevel === 'advanced' && this.stage === 10 && !this.advancedBossEvolved) {
+                    // 上級ステージ10のグランギルドラを倒した場合、進化する
+                    bonusScore = 500;
+                    message = `最終ボス ${this.currentMonster.name}を倒した！\nしかし、${this.currentMonster.name}は進化した！`;
+                    this.advancedBossEvolved = true;
+                } else {
+                    bonusScore = 1000;
+                    message = `最終ボス ${this.currentMonster.name}を倒した！\n伝説のボーナス獲得！おめでとう！`;
+                }
+            } else if (this.currentMonster.name === 'カオスギガドラ') {
+                bonusScore = 2000;
+                message = `真の最終ボス ${this.currentMonster.name}を倒した！\n究極のボーナス獲得！おめでとう！`;
             } else if (this.currentMonster.name === 'まおう') {
                 bonusScore = 500;
                 message = `ステージボス ${this.currentMonster.name}を倒した！\n大ボーナス獲得！おめでとう！`;
@@ -502,22 +637,32 @@ class MathQuestGame {
         
         this.score += bonusScore;
         
-        // ステージ10のボス（まおう）を倒した場合はゲームクリア
-        if (this.currentMonster.name === 'まおう') {
+        // ステージ10のボスを倒した場合はゲームクリア
+        if (this.currentMonster.name === 'まおう' || this.currentMonster.name === 'ヴォルグレイド' || 
+            (this.currentMonster.name === 'グランギルドラ' && this.selectedLevel !== 'advanced') ||
+            this.currentMonster.name === 'カオスギガドラ') {
             this.updateMessage(message);
             setTimeout(() => {
                 this.showGameOver(true); // ゲームクリア
             }, 2000);
         } else {
-            this.stage++;
-            this.updateMessage(message);
-            
-            // 少し待ってから新しいモンスターを出現
-            setTimeout(() => {
-                this.spawnNewMonster();
-                this.generateProblem();
-                this.updateUI();
-            }, 3000);
+            // 上級ステージ10でグランギルドラを倒して進化した場合
+            if (this.selectedLevel === 'advanced' && this.stage === 10 && this.advancedBossEvolved && this.currentMonster.name === 'グランギルドラ') {
+                this.updateMessage(message);
+                setTimeout(() => {
+                    this.showEvolutionEffect();
+                }, 1000);
+            } else {
+                this.stage++;
+                this.updateMessage(message);
+                
+                // 少し待ってから新しいモンスターを出現
+                setTimeout(() => {
+                    this.spawnNewMonster();
+                    this.generateProblem();
+                    this.updateUI();
+                }, 3000);
+            }
         }
     }
     
@@ -576,6 +721,18 @@ class MathQuestGame {
         this.gameOver = false;
         this.currentTime = this.timeLimit;
         this.usedMonsters = []; // 使用済みモンスターリストをリセット
+        this.lastProblem = null; // 前回の問題をリセット
+        this.advancedBossEvolved = false; // 進化フラグをリセット
+
+        
+        // レベルに応じてモンスター配列を再設定
+        if (this.selectedLevel === 'beginner') {
+            this.monsters = this.beginnerMonsters;
+        } else if (this.selectedLevel === 'intermediate') {
+            this.monsters = this.intermediateMonsters;
+        } else if (this.selectedLevel === 'advanced') {
+            this.monsters = this.advancedMonsters;
+        }
         
         // タイマーを停止
         this.stopTimer();
@@ -644,14 +801,36 @@ class MathQuestGame {
         
         // ボス戦を開始
         if (stage === 5) {
-            this.currentMonster = this.midBoss;
-            this.monsterHp = this.midBoss.hp;
-            this.maxMonsterHp = this.midBoss.hp;
+            // レベルに応じたボスを選択
+            if (this.selectedLevel === 'beginner') {
+                this.currentMonster = this.beginnerMidBoss;
+                this.monsterHp = this.beginnerMidBoss.hp;
+                this.maxMonsterHp = this.beginnerMidBoss.hp;
+            } else if (this.selectedLevel === 'intermediate') {
+                this.currentMonster = this.intermediateMidBoss;
+                this.monsterHp = this.intermediateMidBoss.hp;
+                this.maxMonsterHp = this.intermediateMidBoss.hp;
+            } else if (this.selectedLevel === 'advanced') {
+                this.currentMonster = this.advancedStageBoss;
+                this.monsterHp = this.advancedStageBoss.hp;
+                this.maxMonsterHp = this.advancedStageBoss.hp;
+            }
             this.updateMessage(`ちゅうボス ${this.currentMonster.name}があらわれた！きをつけろ！`);
         } else if (stage === 10) {
-            this.currentMonster = this.stageBoss;
-            this.monsterHp = this.stageBoss.hp;
-            this.maxMonsterHp = this.stageBoss.hp;
+            // レベルに応じたステージ10ボスを選択
+            if (this.selectedLevel === 'intermediate') {
+                this.currentMonster = this.intermediateStageBoss;
+                this.monsterHp = this.intermediateStageBoss.hp;
+                this.maxMonsterHp = this.intermediateStageBoss.hp;
+            } else if (this.selectedLevel === 'advanced') {
+                this.currentMonster = this.advancedFinalBoss;
+                this.monsterHp = this.advancedFinalBoss.hp;
+                this.maxMonsterHp = this.advancedFinalBoss.hp;
+            } else {
+                this.currentMonster = this.stageBoss;
+                this.monsterHp = this.stageBoss.hp;
+                this.maxMonsterHp = this.stageBoss.hp;
+            }
             this.updateMessage(`ステージボス ${this.currentMonster.name}があらわれた！けっせんだ！`);
         }
         
@@ -666,6 +845,46 @@ class MathQuestGame {
         
         // UIを更新
         this.updateUI();
+    }
+    
+    showEvolutionEffect() {
+        // 進化エフェクトを表示
+        const evolutionOverlay = document.getElementById('evolutionOverlay');
+        const monsterImage = document.getElementById('monsterImage');
+        
+        // モンスター画像に進化エフェクトを適用
+        monsterImage.classList.add('evolution-effect');
+        
+        // 進化オーバーレイを表示
+        evolutionOverlay.style.display = 'flex';
+        
+        // 2秒後にエフェクトを終了して最終ボス戦を開始
+        setTimeout(() => {
+            monsterImage.classList.remove('evolution-effect');
+            evolutionOverlay.style.display = 'none';
+            this.startEvolvedBossBattle();
+        }, 2000);
+    }
+    
+    startEvolvedBossBattle() {
+        // 進化後の最終ボス戦を開始
+        this.currentMonster = this.advancedEvolvedBoss;
+        this.monsterHp = this.advancedEvolvedBoss.hp;
+        this.maxMonsterHp = this.advancedEvolvedBoss.hp;
+        
+        // ボスフラグを確実に設定
+        this.currentMonster.isBoss = true;
+        
+        // モンスターの見た目を更新
+        this.updateMonsterAppearance();
+        
+        // 問題を生成
+        this.generateProblem();
+        
+        // UIを更新
+        this.updateUI();
+        
+        this.updateMessage(`真の最終ボス ${this.currentMonster.name}があらわれた！けっせんだ！`);
     }
     
     updateMonsterAppearance() {
@@ -683,14 +902,44 @@ class MathQuestGame {
         const gameContainer = document.getElementById('gameContainer');
         let backgroundImage = 'back.png';
         
-        // ステージ5と10の場合はボス背景をランダムに選択
-        if (this.stage === 5 || this.stage === 10) {
-            const bossBackgrounds = ['back_boss01.png', 'back_boss02.png'];
-            backgroundImage = bossBackgrounds[Math.floor(Math.random() * bossBackgrounds.length)];
+        // ステージ5、10、11の場合はボス背景を設定
+        if (this.stage === 5 || this.stage === 10 || this.stage === 11) {
+            if (this.selectedLevel === 'intermediate' && this.stage === 5) {
+                // 中級レベルステージ5のボス戦
+                backgroundImage = 'back_stage2_boss01.png';
+            } else if (this.selectedLevel === 'intermediate' && this.stage === 10) {
+                // 中級レベルステージ10のボス戦
+                backgroundImage = 'back_stage2_boss02.png';
+            } else if (this.selectedLevel === 'advanced' && this.stage === 5) {
+                // 上級レベルステージ5のボス戦
+                backgroundImage = 'back_stage3_boss01.png';
+            } else if (this.selectedLevel === 'advanced' && this.stage === 10) {
+                // 上級レベルステージ10のボス戦
+                backgroundImage = 'back_stage3_boss02.png';
+            } else if (this.selectedLevel === 'advanced' && this.stage === 11) {
+                // 上級レベルステージ11の隠れボス戦
+                backgroundImage = 'back_stage3_boss03.png';
+            } else {
+                // その他のボス戦はランダムに選択
+                const bossBackgrounds = ['back_boss01.png', 'back_boss02.png'];
+                backgroundImage = bossBackgrounds[Math.floor(Math.random() * bossBackgrounds.length)];
+            }
         }
         // 初級のステージ6以降はback02.pngを使用（ステージ5と10以外）
         else if (this.selectedLevel === 'beginner' && this.stage >= 6) {
             backgroundImage = 'back02.png';
+        }
+        // 中級レベルはback_srage2.pngを使用
+        else if (this.selectedLevel === 'intermediate') {
+            backgroundImage = 'back_srage2.png';
+        }
+        // 上級レベルはback_stage3_01.pngを使用（ステージ1-5）
+        else if (this.selectedLevel === 'advanced') {
+            if (this.stage >= 6) {
+                backgroundImage = 'back_stage3_02.png';
+            } else {
+                backgroundImage = 'back_stage3_01.png';
+            }
         }
         
         // スマホ画面の背景も更新（!importantで強制設定）
@@ -699,9 +948,24 @@ class MathQuestGame {
         gameContainer.style.setProperty('background-position', 'center center', 'important');
         gameContainer.style.setProperty('background-size', 'cover', 'important');
         
+        // レベル別クラスの付与
+        gameContainer.classList.remove('beginner-stage', 'intermediate-stage', 'advanced-stage', 'stage-6-plus');
+        if (this.selectedLevel === 'beginner') {
+            gameContainer.classList.add('beginner-stage');
+        } else if (this.selectedLevel === 'intermediate') {
+            gameContainer.classList.add('intermediate-stage');
+        } else if (this.selectedLevel === 'advanced') {
+            gameContainer.classList.add('advanced-stage');
+            // 上級ステージ6以降の場合は追加クラスを付与
+            if (this.stage >= 6) {
+                gameContainer.classList.add('stage-6-plus');
+            }
+        }
+        
         // デバッグ用ログ
         console.log('背景画像設定:', {
             stage: this.stage,
+            selectedLevel: this.selectedLevel,
             isBoss: this.currentMonster.isBoss,
             backgroundImage: backgroundImage,
             gameContainerBackground: gameContainer.style.backgroundImage
@@ -716,6 +980,12 @@ class MathQuestGame {
             monsterImage.style.border = '4px solid #ffd700';
             monsterImage.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.8)';
             monsterImage.classList.add('boss');
+            
+            // 中級ボスの場合は特別なクラスを追加
+            if (this.selectedLevel === 'intermediate') {
+                monsterImage.classList.add('intermediate-boss');
+            }
+            
             gameContainer.classList.add('boss-battle');
         } else {
             monsterImage.style.backgroundImage = `url('./images/${backgroundImage}')`;
@@ -724,7 +994,7 @@ class MathQuestGame {
             monsterImage.style.backgroundSize = 'cover';
             monsterImage.style.border = '4px solid #f7fafc';
             monsterImage.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.3)';
-            monsterImage.classList.remove('boss');
+            monsterImage.classList.remove('boss', 'intermediate-boss');
             gameContainer.classList.remove('boss-battle');
         }
     }
